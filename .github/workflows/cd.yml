@@ -1,0 +1,33 @@
+name: CD - Monolith Deploy
+
+on:
+  workflow_run:
+    workflows: ["CI - Monolith Tests"]
+    types: [completed]
+
+jobs:
+  deploy-staging:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/webapps-deploy@v3
+        with:
+          app-name: karunya-monolith-staging
+          publish-profile: ${{ secrets.AZURE_MONOLITH_STAGING }}
+          package: .
+
+  deploy-production:
+    runs-on: ubuntu-latest
+    needs: deploy-staging
+    environment:
+      name: production
+      url: https://karunya-monolith-prod.azurewebsites.net
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/webapps-deploy@v3
+        with:
+          app-name: karunya-monolith-prod
+          publish-profile: ${{ secrets.AZURE_MONOLITH_PROD }}
+          package: .
