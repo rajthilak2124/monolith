@@ -4,7 +4,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def home():
-    return "Welcome to Karunya Monolithic!"
+    return "Welcome to Karunya Monolithic Applications!"
 
 @app.route("/products")
 def products():
